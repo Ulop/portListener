@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Media;
@@ -7,14 +8,27 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Xml.Linq;
 
 namespace portListener
 {
+    class SensorData
+    {
+        public float[] gyroscope;
+        public float[] light;
+        public float[] rotation;
+        public float[] accelerometer;
+        public float[] gravity;
+    }
+
+
     class Program
     {
         private static List<Socket> clients = new List<Socket>();
         private static Thread listening_thread;
         private static TcpListener listener;
+        private static SensorData sData;
+        
 
         [DllImport("winmm.dll")]
         public static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
@@ -55,11 +69,13 @@ namespace portListener
             sock.Receive(receivedBytes);
 
             string recivedString = System.Text.Encoding.UTF8.GetString(receivedBytes);
-            //recivedString = recivedString.Split('.')[0];
-           // recivedString.
-            Console.WriteLine(recivedString);
-            //int res = int.Parse(recivedString);
-            //changeVolume(res);
+
+            recivedString.Replace("\\", "");
+
+            sData = JsonConvert.DeserializeObject<SensorData>(recivedString);
+            Console.WriteLine(sData.light[0]);
+            int res = (int) sData.light[0];
+            changeVolume(res);
         }
 
         private static void changeVolume(int newVolume)
@@ -76,6 +92,13 @@ namespace portListener
 
         static void Main(string[] args)
         {
+            sData = new SensorData();
+            sData.gyroscope = new float[3];
+            sData.light = new float[2];
+            sData.rotation = new float[4];
+            sData.accelerometer = new float[3];
+            sData.gravity = new float[3];
+
             SoundPlayer player = new SoundPlayer();
             player.SoundLocation = "ocean.wav";
             player.Play();

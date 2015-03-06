@@ -28,6 +28,8 @@ namespace portListener
         private static Thread listening_thread;
         private static TcpListener listener;
         private static SensorData sData;
+
+        private static PereodicPortListener pListener;
         
 
         [DllImport("winmm.dll")]
@@ -63,7 +65,7 @@ namespace portListener
             }
         }
 
-        private static void ParserFunction(Socket sock)
+        private static int ParserFunction(Socket sock)
         {
             byte[] receivedBytes = new byte[255];
             sock.Receive(receivedBytes);
@@ -73,9 +75,10 @@ namespace portListener
             recivedString.Replace("\\", "");
 
             sData = JsonConvert.DeserializeObject<SensorData>(recivedString);
-            Console.WriteLine(sData.light[0]);
+            Console.WriteLine(recivedString);
             int res = (int) sData.light[0];
             changeVolume(res);
+            return 0;
         }
 
         private static void changeVolume(int newVolume)
@@ -102,8 +105,9 @@ namespace portListener
             SoundPlayer player = new SoundPlayer();
             player.SoundLocation = "ocean.wav";
             player.Play();
-            listening_thread = new Thread(new ThreadStart(ListeningThread));
-            listening_thread.Start();
+            //listening_thread = new Thread(new ThreadStart(ListeningThread));
+            //listening_thread.Start();
+            pListener = new PereodicPortListener(5000, 30, ParserFunction);
         }
     }
 }

@@ -10,3 +10,6 @@ PereodicPortListener(int pNumber, int lPer, Func<Socket, int> pFunc)
 **lPer** - period of listening in milliseconds.
 
 **pFunc** - function that parse recived from Socket
+
+Used package:
+- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)

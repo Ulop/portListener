@@ -59,8 +59,12 @@ namespace portListener
            // recivedString.
             Console.WriteLine(recivedString);
             int res = int.Parse(recivedString);
+            //changeVolume(res);
+        }
 
-            int NewVolume = ((ushort.MaxValue / 25) * res);
+        private static void changeVolume(int newVolume)
+        {
+            int NewVolume = ((ushort.MaxValue / 25) * newVolume);
             // Set the same volume for both the left and the right channels
             uint NewVolumeAllChannels = (((uint)NewVolume & 0x0000ffff) | ((uint)NewVolume << 16));
 

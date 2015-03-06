@@ -51,14 +51,14 @@ namespace portListener
 
         private static void ParserFunction(Socket sock)
         {
-            byte[] receivedBytes = new byte[20];
+            byte[] receivedBytes = new byte[255];
             sock.Receive(receivedBytes);
 
             string recivedString = System.Text.Encoding.UTF8.GetString(receivedBytes);
-            recivedString = recivedString.Split('.')[0];
+            //recivedString = recivedString.Split('.')[0];
            // recivedString.
             Console.WriteLine(recivedString);
-            int res = int.Parse(recivedString);
+            //int res = int.Parse(recivedString);
             //changeVolume(res);
         }
 

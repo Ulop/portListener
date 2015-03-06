@@ -2,8 +2,9 @@
 
 This demo how to recive data from optional port. Port listening functions excluded in stand alone class *PereodicPortListener*.
 
+```java
     PereodicPortListener(int pNumber, int lPer, Func<Socket, int> pFunc)
-
+```
 **pNumber** - number of port, which we want to listen.
 
 **lPer** - period of listening in milliseconds.

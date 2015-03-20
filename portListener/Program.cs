@@ -19,13 +19,14 @@ namespace portListener
         public float[] rotation;
         public float[] accelerometer;
         public float[] gravity;
+        public float[] step_count;
     }
 
 
     class Program
     {
         private static List<Socket> clients = new List<Socket>();
-        private static Thread listening_thread;
+        
         private static TcpListener listener;
         private static SensorData sData;
 
@@ -35,39 +36,9 @@ namespace portListener
         [DllImport("winmm.dll")]
         public static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
 
-        private static void ListeningThread() // let's listen in another thread instead!!
-        {
-            int port = 5000; // change as required
-
-            listener = new TcpListener(IPAddress.Any, port);
-
-            try
-            {
-                listener.Start();
-            }
-            catch (Exception e) {
-                Console.WriteLine("couldn't bind to port " + port + " -> " + e.Message); 
-                return; 
-            }
-
-            while (true)
-            {
-                if (listener.Pending())
-                    clients.Add(listener.AcceptSocket()); // won't block because pending was true
-
-                foreach (Socket sock in clients)
-                    if (sock.Poll(0, SelectMode.SelectError))
-                        clients.Remove(sock);
-                    else if (sock.Poll(0, SelectMode.SelectRead))
-                        ParserFunction(sock);
-
-                Thread.Sleep(30);
-            }
-        }
-
         private static int ParserFunction(Socket sock)
         {
-            byte[] receivedBytes = new byte[255];
+            byte[] receivedBytes = new byte[300];
             sock.Receive(receivedBytes);
 
             string recivedString = System.Text.Encoding.UTF8.GetString(receivedBytes);
@@ -77,7 +48,7 @@ namespace portListener
             sData = JsonConvert.DeserializeObject<SensorData>(recivedString);
             Console.WriteLine(recivedString);
             int res = (int) sData.light[0];
-            changeVolume(res);
+           // changeVolume(res);
             return 0;
         }
 
@@ -101,12 +72,11 @@ namespace portListener
             sData.rotation = new float[4];
             sData.accelerometer = new float[3];
             sData.gravity = new float[3];
+            sData.step_count = new float[1];
 
             SoundPlayer player = new SoundPlayer();
             player.SoundLocation = "ocean.wav";
             player.Play();
-            //listening_thread = new Thread(new ThreadStart(ListeningThread));
-            //listening_thread.Start();
             pListener = new PereodicPortListener(5000, 30, ParserFunction);
         }
     }
